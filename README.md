@@ -1,4 +1,9 @@
 # Tiles-Hopper
  An Infinte running casual game
+ ## Start Screen
+  ![start screen image](https://github.com/Alavy/Tiles-Hoppper/blob/749e413b8086fc2186263edad297368ed385c224/Imgs/Start.jpg)
  ## Gameplay
- ![game play image](https://github.com/Alavy/Tiles-Hoppper/blob/73de01b7cca4659eaa9ab3e7f1c2c90d6c64add9/Imgs/gamePlay.JPG)
+ ![game play image](https://github.com/Alavy/Tiles-Hoppper/blob/749e413b8086fc2186263edad297368ed385c224/Imgs/gamePlay.JPG)
+ ## Game Over
+  ![game play image]( https://github.com/Alavy/Tiles-Hoppper/blob/749e413b8086fc2186263edad297368ed385c224/Imgs/End.jpg)
+
