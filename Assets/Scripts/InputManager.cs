@@ -8,14 +8,13 @@ using UnityEngine.InputSystem;
 public class InputManager : MonoBehaviour
 {
     public static Action<Vector2> OnSwipe;
+
     [SerializeField]
-    [Range(0.1f,100f)]
-    private float fingDistance = 1.0f;
+    private float fingerMoveRange = 60f;
+
     private TouchControls m_inputActions;
     private Vector2 m_startFingPos;
-    private Vector2 m_prevFingPos;
     private bool m_isFingerDown = false;
-    private double m_startTime = 0;
 
     private void Awake()
     {
@@ -40,7 +39,6 @@ public class InputManager : MonoBehaviour
     private void primaryContractStarted(InputAction.CallbackContext ctx)
     {
         m_startFingPos = m_inputActions.Touch.PrimaryPosition.ReadValue<Vector2>();
-        m_startTime = ctx.startTime;
         m_isFingerDown = true;     
     }
     private void primaryContractCanceled(InputAction.CallbackContext ctx)
@@ -53,14 +51,11 @@ public class InputManager : MonoBehaviour
         if (m_isFingerDown)
         {
             Vector2 fingPos = m_inputActions.Touch.PrimaryPosition.ReadValue<Vector2>();
-            if (Vector2.Distance(m_prevFingPos, fingPos) < fingDistance)
-            {
-                m_startFingPos = fingPos;
-            }
-            m_prevFingPos = fingPos;
-
-            Vector2 deltaPos = (fingPos - m_startFingPos).normalized;
+            
+            Vector2 deltaPos = Vector2.ClampMagnitude(fingPos - m_startFingPos, fingerMoveRange);
+            deltaPos = deltaPos / fingerMoveRange;
             OnSwipe?.Invoke(deltaPos);
+            m_startFingPos = fingPos;
         }
     }
 }
