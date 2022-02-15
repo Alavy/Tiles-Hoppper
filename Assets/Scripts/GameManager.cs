@@ -130,9 +130,9 @@ public class GameManager : MonoBehaviour
             });
         scoreUI.text = m_score.ToString();
     }
-    private void onOriginChanged(float zOffset)
+    private void onOriginChanged(Vector3 offset)
     {
-        m_zOffsetpos = m_zOffsetpos + zOffset;
+        m_zOffsetpos = m_zOffsetpos + offset.z;
     }
     private void onPlayerCollideWithCollectable(Transform obj)
     {

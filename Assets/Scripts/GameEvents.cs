@@ -5,14 +5,14 @@ using System;
 
 public static class GameEvents 
 {
-    public static Action<float> OnOriginChanged;
+    public static Action<Vector3> OnOriginChanged;
     public static Action OnPlayerCollideWithPlatform;
     public static Action OnPlatformMoved;
     public static Action<Transform> OnPlayerCollideWithCollectable;
     
-    public static void  OriginChanged(float zOffset)
+    public static void  OriginChanged(Vector3 offset)
     {
-        OnOriginChanged?.Invoke(zOffset);
+        OnOriginChanged?.Invoke(offset);
     }
     public static void PlayerCollideWithPlatform()
     {

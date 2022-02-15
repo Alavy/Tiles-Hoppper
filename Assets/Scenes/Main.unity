@@ -313,8 +313,8 @@ GameObject:
   - component: {fileID: 303796184}
   - component: {fileID: 303796183}
   - component: {fileID: 303796182}
-  - component: {fileID: 303796188}
   - component: {fileID: 303796189}
+  - component: {fileID: 303796188}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -357,6 +357,9 @@ MonoBehaviour:
   jumpHeight: 2
   jumpSound: {fileID: 8300000, guid: 23eac382fa19b7847ac57d9170c757d9, type: 3}
   coinSound: {fileID: 8300000, guid: 391908b58e627914ea577a13304a5189, type: 3}
+  tailPosCount: 5
+  tailPosApartDistance: 0.04
+  followSpeed: 0.08
   sqashAmonut: {x: 1.5, y: 0.9, z: 1.5}
 --- !u!135 &303796184
 SphereCollider:
@@ -435,16 +438,15 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!96 &303796188
-TrailRenderer:
-  serializedVersion: 2
+--- !u!120 &303796188
+LineRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 303796181}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -477,16 +479,21 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.1
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: -0.04}
+  - {x: 0, y: 0, z: -0.0482}
+  - {x: 0, y: 0, z: -0.12}
+  - {x: 0, y: 0, z: -0.16}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.3
+    widthMultiplier: 1
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 1
+        value: 0.04076773
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -494,7 +501,7 @@ TrailRenderer:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.95810056
+        time: 1
         value: 0
         inSlope: 0
         outSlope: 0
@@ -507,8 +514,8 @@ TrailRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0, g: 0.9716981, b: 0.91020155, a: 1}
-      key1: {r: 1, g: 1, b: 1, a: 0.25882354}
+      key0: {r: 0, g: 1, b: 0.8997545, a: 1}
+      key1: {r: 0, g: 1, b: 0.89879274, a: 0}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -523,7 +530,7 @@ TrailRenderer:
       ctime5: 0
       ctime6: 0
       ctime7: 0
-      atime0: 0
+      atime0: 17733
       atime1: 65535
       atime2: 0
       atime3: 0
@@ -538,11 +545,10 @@ TrailRenderer:
     numCapVertices: 0
     alignment: 0
     textureMode: 0
-    shadowBias: 0.5
+    shadowBias: 0
     generateLightingData: 0
-  m_MinVertexDistance: 0.1
-  m_Autodestruct: 0
-  m_Emitting: 1
+  m_UseWorldSpace: 1
+  m_Loop: 0
 --- !u!82 &303796189
 AudioSource:
   m_ObjectHideFlags: 0
@@ -973,7 +979,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2040bbd92e96fd4b94c7dfcf3677a2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fingDistance: 30
+  fingerMoveRange: 60
 --- !u!4 &1380944263
 Transform:
   m_ObjectHideFlags: 0
@@ -1088,7 +1094,7 @@ MonoBehaviour:
   followedObject: {fileID: 303796187}
   followSpeedZ: 0.1
   followSpeedX: 0.6
-  thresold: 1000
+  thresold: 5
 --- !u!114 &1773965671
 MonoBehaviour:
   m_ObjectHideFlags: 0

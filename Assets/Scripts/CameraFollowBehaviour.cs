@@ -65,7 +65,7 @@ public class CameraFollowBehaviour : MonoBehaviour
             Vector3 cPos = (transform.position - followPos);
             transform.position = new Vector3(cPos.x, transform.position.y, cPos.z);
 
-            GameEvents.OriginChanged(followPos.z);
+            GameEvents.OriginChanged(followPos);
         }
     }
     private void Update()

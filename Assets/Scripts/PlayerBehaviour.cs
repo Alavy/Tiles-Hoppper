@@ -19,6 +19,12 @@ public class PlayerBehaviour : MonoBehaviour
     private AudioClip jumpSound;
     [SerializeField]
     private AudioClip coinSound;
+    [SerializeField]
+    private int tailPosCount=5;
+    [SerializeField]
+    private float tailPosApartDistance = 0.2f;
+    [SerializeField]
+    private float followSpeed = 0.4f;
 
     [SerializeField]
     private Vector3 sqashAmonut = new Vector3(1.5f,.95f,1.5f);
@@ -43,11 +49,15 @@ public class PlayerBehaviour : MonoBehaviour
     private Camera m_camera;
     private GameManager m_gameManager;
     private AudioSource m_audioSource;
+    private LineRenderer m_tail;
+
+    private Vector3[] m_tailPositions;
+    private Vector3[] m_tailVec;
     void Start()
     {
         m_gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         m_audioSource = GetComponent<AudioSource>();
-
+        m_tail = GetComponent<LineRenderer>();
         if (m_gameManager == null)
         {
             Debug.LogError("Missing Game Manager");
@@ -63,18 +73,31 @@ public class PlayerBehaviour : MonoBehaviour
         Time.timeScale = 1.0f;
         m_camera = Camera.main;
         m_orgnlScale = transform.localScale;
+        m_tailPositions = new Vector3[tailPosCount+1];
+        m_tailVec = new Vector3[tailPosCount];
+        m_tail.positionCount = tailPosCount;
+        for (int i = 1; i < tailPosCount+1; i++)
+        {
+            m_tailPositions[i] = new Vector3(0,- i * tailPosApartDistance, 0);
+        }
+        m_tailPositions[0] = transform.position;
+        m_tail.SetPositions(m_tailPositions);
     }
 
     private void onSwipe(Vector2 dir)
     {
         m_dir = m_dir + dir * Time.deltaTime * movementSensitivity;
     }
-    private void onOriginChanged(float zOffset)
+    private void onOriginChanged(Vector3 offset)
     {
         m_startPos = transform.position;
         m_targetPos = m_gameManager.CurrentPlatform();
         m_middlePos = (m_targetPos + m_startPos) * 0.5f
            + new Vector3(0, jumpHeight, 0);
+        for (int i = 1; i < tailPosCount + 1; i++)
+        {
+            m_tailPositions[i] = m_tailPositions[i]- offset;
+        }
     }
 
     private void sniffingNextPlatForm()
@@ -112,6 +135,14 @@ public class PlayerBehaviour : MonoBehaviour
             ref m_linVelocity, smoothTime);
 
         m_timeElapsed += Time.deltaTime;
+
+        // Tail
+        m_tailPositions[0] = transform.position;
+        for (int i = 1; i < tailPosCount+1; i++)
+        {
+            m_tailPositions[i] = Vector3.SmoothDamp(m_tailPositions[i], m_tailPositions[i - 1]- new Vector3(0,0,tailPosApartDistance), ref m_tailVec[i - 1], followSpeed);
+        }
+        m_tail.SetPositions(m_tailPositions);
 
         // Keep Inside view Volume
         Vector3 viewPos = m_camera.WorldToViewportPoint(transform.position);
