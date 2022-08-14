@@ -36,6 +36,10 @@ public class GameManager : MonoBehaviour
     private float timeScaleIncrement = 0.01f;
     [SerializeField]
     private float timeAfter = 20.0f;
+    [SerializeField]
+    private float xPlatformDisplacemnt=1f;
+    [SerializeField]
+    private float zPlatformDisplacemnt = 2f;
 
     private float m_time = 0;
     private float m_timeScale = 1f;
@@ -68,12 +72,14 @@ public class GameManager : MonoBehaviour
             m_platForms[i] = Instantiate(platForm);
             if (i < platformBatchCount)
             {
-                m_platForms[i].position = new Vector3(0, 0, i * 1.7f);
+                m_platForms[i].position = new Vector3(-xPlatformDisplacemnt, 0,
+                    i * zPlatformDisplacemnt);
 
             }
             else
             {
-                m_platForms[i].position = new Vector3(0.9f, 0, i * 1.8f);
+                m_platForms[i].position = new Vector3(xPlatformDisplacemnt,
+                    0, i * zPlatformDisplacemnt);
             }
         }
         m_collecatbles = new Transform[collectableCount];
@@ -110,9 +116,7 @@ public class GameManager : MonoBehaviour
         gameOverUIObj.gameObject.SetActive(false);
 
         scoreUI.text = m_score.ToString();
-        GameEvents.OnPlayerCollideWithPlatform += onPlayerCollideWithPlatform;
-        GameEvents.OnOriginChanged += onOriginChanged;
-        GameEvents.OnPlayerCollideWithCollectable += onPlayerCollideWithCollectable;
+       
     }
     private void onPlayerCollideWithPlatform()
     {
@@ -122,10 +126,11 @@ public class GameManager : MonoBehaviour
     private void updateScore(int score)
     {
         m_score = m_score + score;
-        scoreUI.transform.LeanScale(new Vector3(1.4f, 1.4f, 1), 0.2f)
+        scoreUI.transform.LeanScale(new Vector3(1.1f, 1.1f,
+            1f), 0.2f)
             .setEase(LeanTweenType.easeShake)
             .setOnComplete(() => { 
-                scoreUI.transform.LeanScale(new Vector3(1f, 1f, 1), 0.2f)
+                scoreUI.transform.LeanScale(new Vector3(1f, 1f, 1f), 0.2f)
                 .setEase(LeanTweenType.easeShake); 
             });
         scoreUI.text = m_score.ToString();
@@ -150,6 +155,12 @@ public class GameManager : MonoBehaviour
         m_particle.Play();
 
     }
+    private void OnEnable()
+    {
+        GameEvents.OnPlayerCollideWithPlatform += onPlayerCollideWithPlatform;
+        GameEvents.OnOriginChanged += onOriginChanged;
+        GameEvents.OnPlayerCollideWithCollectable += onPlayerCollideWithCollectable;
+    }
     private void OnDisable()
     {
         GameEvents.OnPlayerCollideWithPlatform -= onPlayerCollideWithPlatform;
@@ -170,19 +181,31 @@ public class GameManager : MonoBehaviour
         {
             if (m_platformIndex % 2 == 0)
             {
-                m_platForms[i].position = new Vector3(xPlayerPos - 0.9f, 0, (lastZdispl + (index) * 2.3f)+ tweenZdispl);
+                m_platForms[i].position = new Vector3(
+                    -xPlatformDisplacemnt 
+                    - Random.Range(-0.3f,0.3f), 0, 
+                    (lastZdispl 
+                    + (index) * zPlatformDisplacemnt)+ tweenZdispl);
+
                 m_platForms[i].gameObject.SetActive(false);
                 pts.Add(m_platForms[i]);
                 index++;
-
+               
 
             }
             else
             {
-                m_platForms[i].position = new Vector3(xPlayerPos + 0.9f, 0, (lastZdispl + (index) * 2.3f) + tweenZdispl);
+                m_platForms[i].position = new Vector3(
+                    xPlatformDisplacemnt +
+                    Random.Range(-0.3f, 0.3f), 0, 
+                    (lastZdispl + (index) 
+                    * zPlatformDisplacemnt)
+                    + tweenZdispl);
+
                 m_platForms[i].gameObject.SetActive(false);
                 pts.Add(m_platForms[i]);
                 index++;
+               
             }
         }
         var sq = LeanTween.sequence();
@@ -224,6 +247,7 @@ public class GameManager : MonoBehaviour
             Vector3 p3 = Vector3.Lerp(p1, p2, t);
 
             m_collecatbles[i].position = p3;
+            m_collecatbles[i].GetComponent<MeshRenderer>().material.color = Random.ColorHSV(.2f, 1f, 1f, 1f, 0.7f, 1f);
 
         }
     }

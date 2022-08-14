@@ -25,6 +25,8 @@ public class PlayerBehaviour : MonoBehaviour
     private float tailPosApartDistance = 0.2f;
     [SerializeField]
     private float followSpeed = 0.4f;
+    [SerializeField]
+    private float zCorrection = 0.2f;
 
     [SerializeField]
     private Vector3 sqashAmonut = new Vector3(1.5f,.95f,1.5f);
@@ -68,8 +70,6 @@ public class PlayerBehaviour : MonoBehaviour
         }
         planPath(m_gameManager.CurrentPlatform());
         
-        InputManager.OnSwipe += onSwipe;
-        GameEvents.OnOriginChanged += onOriginChanged;
         Time.timeScale = 1.0f;
         m_camera = Camera.main;
         m_orgnlScale = transform.localScale;
@@ -86,7 +86,8 @@ public class PlayerBehaviour : MonoBehaviour
 
     private void onSwipe(Vector2 dir)
     {
-        m_dir = m_dir + dir * Time.deltaTime * movementSensitivity;
+        m_dir = m_dir + 
+            dir * Time.deltaTime * movementSensitivity;
     }
     private void onOriginChanged(Vector3 offset)
     {
@@ -100,37 +101,16 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
-    private void sniffingNextPlatForm()
-    {
-        Vector3 nextPlatform = m_gameManager.CurrentPlatform();
-        float angle = Vector3.Angle(transform.forward, nextPlatform - transform.position);
-
-        if (angle < lookAngle && m_targetPos != nextPlatform)
-        {
-            planPath(nextPlatform);
-        }
-    }
-    private void sniffingNextPlatFormTest()
-    {
-        Vector3 nextPlatform = m_gameManager.CurrentPlatform();
-        if (m_targetPos != nextPlatform)
-        {
-            planPath(nextPlatform);
-        }
-    }
-
     // Update is called once per frame
     private void Update()
     {
-        sniffingNextPlatForm();
-        //sniffingNextPlatFormTest();
         float perCentile = m_timeElapsed / jumpDuration;
-        
         m_p1 = Vector3.Lerp(m_startPos, m_middlePos, perCentile);
         m_p2 = Vector3.Lerp(m_middlePos, m_targetPos, perCentile);
         m_p3 = Vector3.Lerp(m_p1, m_p2, perCentile);
 
-        transform.position = Vector3.SmoothDamp(transform.position,
+        transform.position = Vector3.SmoothDamp(
+            transform.position,
             m_p3 + new Vector3(m_dir.x, 0, 0),
             ref m_linVelocity, smoothTime);
 
@@ -140,7 +120,9 @@ public class PlayerBehaviour : MonoBehaviour
         m_tailPositions[0] = transform.position;
         for (int i = 1; i < tailPosCount+1; i++)
         {
-            m_tailPositions[i] = Vector3.SmoothDamp(m_tailPositions[i], m_tailPositions[i - 1]- new Vector3(0,0,tailPosApartDistance), ref m_tailVec[i - 1], followSpeed);
+            m_tailPositions[i] = Vector3.SmoothDamp(
+                m_tailPositions[i], 
+                m_tailPositions[i - 1]- new Vector3(0,0,tailPosApartDistance), ref m_tailVec[i - 1], followSpeed);
         }
         m_tail.SetPositions(m_tailPositions);
 
@@ -156,6 +138,11 @@ public class PlayerBehaviour : MonoBehaviour
             m_gameManager.GameOver();
         }
     }
+    private void OnEnable()
+    {
+        InputManager.OnSwipe += onSwipe;
+        GameEvents.OnOriginChanged += onOriginChanged;
+    }
     private void OnDisable()
     {
         InputManager.OnSwipe -= onSwipe;
@@ -166,19 +153,31 @@ public class PlayerBehaviour : MonoBehaviour
         if (other.collider.CompareTag("Platform"))
         {
             //for smoothing the motion
-
             m_dir = Vector2.zero;
+
             Vector3 nextPlatform = m_gameManager.NextPlatform();
 
-            float angle = Vector3.Angle(transform.forward, nextPlatform - transform.position);
-            if (angle >= lookAngle)
+            float angle = Vector3.Angle(transform.forward,
+                nextPlatform - transform.position);
+            
+            if (angle < lookAngle)
             {
-                planPath(transform.position + 3 * transform.forward - new Vector3(0, 1f, 0));
+                planPath(nextPlatform);
             }
-            transform.LeanScale(new Vector3(m_orgnlScale.x * sqashAmonut.x, m_orgnlScale.y * sqashAmonut.y, m_orgnlScale.z * sqashAmonut.z),
+            else if (angle >= lookAngle)
+            {
+                planPath(transform.position
+                    + new Vector3(0,
+                    -1f, nextPlatform.z 
+                    - transform.position.z + zCorrection));
+            }
+            transform.LeanScale(new Vector3(m_orgnlScale.x 
+                * sqashAmonut.x, 
+                m_orgnlScale.y * sqashAmonut.y, 
+                m_orgnlScale.z * sqashAmonut.z),
                 0.1f).setOnComplete(()=> {
                 transform.LeanScale(m_orgnlScale, 0.1f);
-            });
+              });
             m_audioSource.PlayOneShot(jumpSound);
             GameEvents.PlayerCollideWithPlatform();
         }
@@ -187,7 +186,8 @@ public class PlayerBehaviour : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Collectable"))
         {
-            GameEvents.PlayerCollideWithCollectable(other.transform);
+            GameEvents.PlayerCollideWithCollectable(
+                other.transform);
             m_audioSource.PlayOneShot(coinSound);
 
         }

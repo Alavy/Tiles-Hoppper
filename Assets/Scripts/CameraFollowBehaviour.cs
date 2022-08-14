@@ -43,7 +43,16 @@ public class CameraFollowBehaviour : MonoBehaviour
             m_moveableObjs.Add(coltObjs[i].transform);
         }
         m_moveableObjs.Add(meterObj.transform);
+    }
+    private void OnEnable()
+    {
         GameEvents.OnPlatformMoved += onPlatformMoved;
+
+    }
+    private void OnDisable()
+    {
+        GameEvents.OnPlatformMoved -= onPlatformMoved;
+
     }
     private void onPlatformMoved()
     {
